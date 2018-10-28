@@ -28,12 +28,23 @@ public class CalcServlet extends HttpServlet {
         Integer firstNum = StringUtils.isNumeric(a) ? Integer.valueOf(a) : 0;
         Integer secondNum = StringUtils.isNumeric(b) ? Integer.valueOf(b) : 0;
 
-        System.out.println(">>>>>>>>>>>>>>>" + request.getRemoteAddr());
+        String operation = Optional.ofNullable(request.getPathInfo())
+                .orElse(request.getParameter("operation"));
 
-        CalculationResult result = calculate(request.getPathInfo(), firstNum, secondNum);
+        CalculationResult result = calculate(operation, firstNum, secondNum);
 
-        PrintWriter printWriter = response.getWriter();
-        printWriter.println("<h1>" + result.resultRepresentation +  "</h1>");
+        if (!result.calculated) {
+//            response.setStatus(302);
+//            response.addHeader("Location", request.getContextPath() +
+//                    "/calc-form?error_message="
+//                    +result.resultRepresentation);
+
+            response.sendRedirect(request.getContextPath() + "/calc-form?error_message="
+                    +result.resultRepresentation);
+        } else {
+            PrintWriter printWriter = response.getWriter();
+            printWriter.println("<h1>" + result.resultRepresentation + "</h1>");
+        }
 
 
     }
@@ -41,26 +52,32 @@ public class CalcServlet extends HttpServlet {
     private CalculationResult calculate(String path, int a, int b) {
         if (path.endsWith("add")) {
             return new CalculationResult(a + b,
-                    a + " + " + b + " = " + (a + b));
+                    a + " + " + b + " = " + (a + b),
+                    true);
         } else if (path.endsWith("subtraction")) {
             return new CalculationResult(a - b,
-                    a + " - " + b + " = " + (a - b));
+                    a + " - " + b + " = " + (a - b),
+                    true);
         } else if (path.endsWith("multiply")) {
             return new CalculationResult(a * b,
-                    a + " * " + b + " = " + (a * b));
+                    a + " * " + b + " = " + (a * b),
+                    true);
         } else
             return new CalculationResult(0,
-                    "Unsupported operation");
+                    "Unsupported operation",
+                    false);
     }
 
 
     private static class CalculationResult {
         private Integer result;
         private String resultRepresentation;
+        private boolean calculated;
 
-        public CalculationResult(Integer result, String resultRepresentation) {
+        public CalculationResult(Integer result, String resultRepresentation, boolean calculated) {
             this.result = result;
             this.resultRepresentation = resultRepresentation;
+            this.calculated = calculated;
         }
 
         public Integer getResult() {
