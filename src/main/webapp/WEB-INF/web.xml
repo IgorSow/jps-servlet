@@ -1,4 +1,6 @@
 <web-app xmlns="http://java.sun.com/xml/ns/javaee" version="2.5">
+
+    <!--Hello World-->
     <servlet>
         <servlet-name>HelloServlet</servlet-name>
         <servlet-class>com.sda.HelloServlet</servlet-class>
@@ -9,25 +11,33 @@
         <url-pattern>/hello-world</url-pattern>
     </servlet-mapping>
 
-
+    <!--Calc-->
     <servlet>
         <servlet-name>CalcServlet</servlet-name>
         <servlet-class>com.sda.CalcServlet</servlet-class>
     </servlet>
-
     <servlet-mapping>
         <servlet-name>CalcServlet</servlet-name>
         <url-pattern>/calc/*</url-pattern>
     </servlet-mapping>
 
-
+    <!--Calck-Form-->
     <servlet>
         <servlet-name>CalcFormServlet</servlet-name>
         <servlet-class>com.sda.CalcFormServlet</servlet-class>
     </servlet>
-
     <servlet-mapping>
         <servlet-name>CalcFormServlet</servlet-name>
         <url-pattern>/calc-form</url-pattern>
+    </servlet-mapping>
+
+    <!--Books-->
+    <servlet>
+        <servlet-name>BookServlet</servlet-name>
+        <servlet-class>com.sda.books.application.BookServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>BookServlet</servlet-name>
+        <url-pattern>/books</url-pattern>
     </servlet-mapping>
 </web-app>
