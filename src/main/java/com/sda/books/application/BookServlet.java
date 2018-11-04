@@ -12,8 +12,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class BookServlet extends HttpServlet {
     private BooksService booksService;
@@ -23,9 +25,9 @@ public class BookServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
 
-        List<Book> books = Arrays.asList(new Book("441421", "Ogniem i mieczek", "fajna", "Sienkiewicz", LocalDate.of(1990, 12, 12)),
-                new Book("426234134", "Quo vadis", "nudna", "Sienkiewicz", LocalDate.of(1900, 12, 12)),
-                new Book("42532134", "AAAA", "gggg", "gggg", LocalDate.of(1940, 1, 12)));
+        List<Book> books = Arrays.asList(new Book(1, "441421", "Ogniem i mieczek", "fajna", "Sienkiewicz", LocalDate.of(1990, 12, 12)),
+                new Book(2, "426234134", "Quo vadis", "nudna", "Sienkiewicz", LocalDate.of(1900, 12, 12)),
+                new Book(3, "42532134", "AAAA", "gggg", "gggg", LocalDate.of(1940, 1, 12)));
         BooksRepository booksRepository = new InMemoryBooksrepository(books);
         booksService = new BooksService(booksRepository);
         bookViews = new BookViews();
@@ -33,17 +35,30 @@ public class BookServlet extends HttpServlet {
 
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String author = req.getParameter("author");
-        List<Book> bookList = StringUtils.isEmpty(author) ?
-                booksService.findAll() :
-                booksService.findByauthor(author);
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String author = request.getParameter("author");
+        String idBook = request.getParameter("idBook");
+
+        List<Book> bookList = new ArrayList<>();
+        Optional<Book> book;
+        if (StringUtils.isNoneEmpty(idBook)) {
+
+            book = booksService.findById(Integer.parseInt(idBook));
+            bookList.add(book.get());
 
 
+        } else {
 
-        bookViews.printBooks(resp.getWriter(), bookList);
-        resp.setContentType("text/html");
+            bookList = StringUtils.isEmpty(author) ?
+                    booksService.findAll() :
+                    booksService.findByauthor(author);
+        }
+        request.setAttribute("books", bookList);
+        request.setAttribute("authorFilter", StringUtils.isNotEmpty(author));
+        request.getRequestDispatcher("WEB-INF/jsp/bookList.jsp").forward(request, response);
+//        bookViews.printBooks(response.getWriter(), bookList);
+//        response.setContentType("text/html");
+
     }
 
 }
-;
